@@ -264,11 +264,11 @@ For world model training, we set image_resolution to 512.
 #### Step 1: Libero Data Preparation
 
 Preprocess the dataset as described above, ensuring the `image_resolution` is set to 512.
-Finally, use 
+Finally, run the following command to concatenate tokens:
 ```bash
 python concate_action_world_model_data_libero.py --source_dir_patterns libero_goal_his_1_train_third_view_wrist_a2i_512 --all_patterns libero_goal_his_1_train_third_view_wrist_a2i_512
 ```
-to concate tokens.
+
 
 #### Step 2: Prepare data configs
 Set the correct data path in the config files in `rynnvla-002/configs/libero_goal/his_1_third_view_wrist_512_only_wroldmodel_pretokenize.yaml`.
