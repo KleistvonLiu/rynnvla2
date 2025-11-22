@@ -39,25 +39,8 @@ VLA model generates actions given the text instruction and image observations.
 |         |         |         |  
 | :-----: | :-----: | :-----: |  
 | ![Open drawer](rynnvla-002/assets/action_model_open_the_middle_drawer_of_the_cabinet.gif) | ![Pick up soup](rynnvla-002/assets/action_model_pick_up_the_alphabet_soup_and_place_it_in_the_bask.gif) | ![Pick up bowl](rynnvla-002/assets/action_model_pick_up_the_black_bowl_between_the_plate_and_the_r.gif) |
-| Input: Open the middle drawer of the cabinet. | Input: Pick up the alphabet soup and place it in the basket. | Input: Pick up the black bowl between the plate and the ramekin and place it on the plate. |
 <br>
 
-<table>
-  <tr>
-    <td>
-      <img src="rynnvla-002/assets/action_model_open_the_middle_drawer_of_the_cabinet.gif" width="200" height="200">
-      <p>Open the middle drawer of the cabinet.</p>
-    </td>
-    <td>
-      <img src="rynnvla-002/assets/action_model_pick_up_the_alphabet_soup_and_place_it_in_the_bask.gif" width="200" height="200">
-      <p>Pick up the alphabet soup and place it in the basket.</p>
-    </td>
-    <td>
-      <img src="rynnvla-002/assets/action_model_pick_up_the_black_bowl_between_the_plate_and_the_r.gif" width="200" height="200">
-      <p>Pick up the black bowl between the plate and ramekin and place it on the plate.</p>
-    </td>
-  </tr>
-</table>
 
 
 ### World Model Results (Action + Image -> Image)
@@ -67,7 +50,6 @@ World Model generates the next frame given the current frame and action control.
 | :-----: | :-----: | :-----: |  
 | ![Open drawer](rynnvla-002/assets/pickuptheblackbowlandplaceitontheplate_front.gif) | ![Pick up soup](rynnvla-002/assets/put_the_cream_cheese_box_in_the_basket_front.gif) | ![Pick up bowl](rynnvla-002/assets/putthebowlontopofthecabinet_front.gif) |
 | ![Open drawer](rynnvla-002/assets/pickuptheblackbowlandplaceitontheplate_wrist.gif) | ![Pick up soup](rynnvla-002/assets/put_the_cream_cheese_box_in_the_basket_wrist.gif) | ![Pick up bowl](rynnvla-002/assets/putthebowlontopofthecabinet_wrist.gif) |
-| Input: Action sequence of "Pick up the black bowl and place it on the plate". | Input: Action sequence of "Put the cream cheese box in the basket front". | Input: Action sequence of "Put the bowl on top of the cabinet". |
 <br>
 
 
