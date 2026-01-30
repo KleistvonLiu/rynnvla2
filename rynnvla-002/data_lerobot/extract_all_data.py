@@ -26,14 +26,14 @@ def process_episode_file(episode_path):
     """
     try:
         with h5py.File(episode_path, 'r') as root:
-            required_datasets = ['obs/front_image', 'obs/wrist_image', 'obs/wrist_image', 'obs/state', 'action']
+            required_datasets = ['obs/front_image', 'obs/wrist_image', 'obs/state', 'action']
             if not all(d in root for d in required_datasets):
                 print(f"Skipping invalid file {episode_path}: missing required datasets.")
                 return None
 
             front_images_dataset = root['obs/front_image']
             wrist_images_dataset = root['obs/wrist_image']
-            right_images_dataset = root['obs/right_image']
+            right_images_dataset = root['obs/right_image'] if 'obs/right_image' in root else None
             
             all_states = root['obs/state'][:]
             all_abs_actions = root['action'][:]
@@ -55,14 +55,14 @@ def process_episode_file(episode_path):
                 state_for_action = current_state[:action_targets.shape[1]]
                 rel_actions_sequence = action_targets - state_for_action[np.newaxis, :]
                 # rel_actions_sequence = action_targets - current_state[np.newaxis, :]
-                rel_actions_sequence_2 = action_targets - current_state[np.newaxis, :]
+                rel_actions_sequence_2 = action_targets - state_for_action[np.newaxis, :]
                 rel_actions_sequence_2[:, -1] = action_targets[:, -1]
 
                 if np.sum(np.abs(rel_actions_sequence_2)) != 0:
                     valid_indices.append(idx)
                     abs_action_sequences_for_valid_indices.append(rel_actions_sequence_2)
                     rel_action_sequences_for_valid_indices.append(rel_actions_sequence )
-                    states_for_valid_indices.append(current_state)
+                    states_for_valid_indices.append(state_for_action)
 
             if not valid_indices:
                 print(f"  No valid (non-static over CK horizon) actions found in {episode_path}.")
@@ -70,18 +70,20 @@ def process_episode_file(episode_path):
 
             front_images_valid = []
             wrist_images_valid = []
-            right_images_valid = []
+            right_images_valid = [] if right_images_dataset is not None else None
 
             for i in range(0, len(valid_indices), CHUNK_SIZE):
                 indices_chunk = valid_indices[i:i + CHUNK_SIZE]
                 front_images_valid.append(front_images_dataset[indices_chunk])
                 wrist_images_valid.append(wrist_images_dataset[indices_chunk])
-                right_images_valid.append(right_images_dataset[indices_chunk])
+                if right_images_dataset is not None:
+                    right_images_valid.append(right_images_dataset[indices_chunk])
 
             if front_images_valid:
                 front_images_valid = np.concatenate(front_images_valid, axis=0)
                 wrist_images_valid = np.concatenate(wrist_images_valid, axis=0)
-                right_images_valid = np.concatenate(right_images_valid, axis=0)
+                if right_images_valid is not None:
+                    right_images_valid = np.concatenate(right_images_valid, axis=0)
                 states_valid = np.array(states_for_valid_indices)
                 return front_images_valid, wrist_images_valid, abs_action_sequences_for_valid_indices, rel_action_sequences_for_valid_indices, states_valid, right_images_valid
 
@@ -90,21 +92,22 @@ def process_episode_file(episode_path):
         return None
 
 
-def save_processed_data(output_dir, front_images, wrist_images, abs_action_sequences, rel_action_sequences, states, right_images):
+def save_processed_data(output_dir, front_images, wrist_images, abs_action_sequences, rel_action_sequences, states, right_images=None):
     """
     Saves the processed data. Images and states are saved as individual files,
     and action sequences are saved into subdirectories.
     """
     front_image_dir = os.path.join(output_dir, 'front_image')
     wrist_image_dir = os.path.join(output_dir, 'wrist_image')
-    right_image_dir = os.path.join(output_dir, 'right_image')
     abs_action_dir = os.path.join(output_dir, 'abs_action')
     rel_action_dir = os.path.join(output_dir, 'rel_action')
     state_dir = os.path.join(output_dir, 'state')
 
     os.makedirs(front_image_dir, exist_ok=True)
     os.makedirs(wrist_image_dir, exist_ok=True)
-    os.makedirs(right_image_dir, exist_ok=True)
+    if right_images is not None:
+        right_image_dir = os.path.join(output_dir, 'right_image')
+        os.makedirs(right_image_dir, exist_ok=True)
     os.makedirs(abs_action_dir, exist_ok=True)
     os.makedirs(rel_action_dir, exist_ok=True)
     os.makedirs(state_dir, exist_ok=True)
@@ -118,7 +121,8 @@ def save_processed_data(output_dir, front_images, wrist_images, abs_action_seque
 
         Image.fromarray(front_images[i]).save(os.path.join(front_image_dir, f"image_{i}.png"))
         Image.fromarray(wrist_images[i]).save(os.path.join(wrist_image_dir, f"image_{i}.png"))
-        Image.fromarray(right_images[i]).save(os.path.join(right_image_dir, f"image_{i}.png"))
+        if right_images is not None:
+            Image.fromarray(right_images[i]).save(os.path.join(right_image_dir, f"image_{i}.png"))
         np.save(os.path.join(state_dir, f"state_{i}.npy"), states[i])
 
         os.makedirs(abs_action_sequence_dir, exist_ok=True)
