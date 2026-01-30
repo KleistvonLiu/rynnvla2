@@ -67,11 +67,11 @@ def load_and_validate_action(file_path):
     """
     try:
         action_data = np.load(file_path)
-        if action_data.shape == (6,):
+        if action_data.shape == (7,):
             return action_data
         else:
             # 将警告和错误打印到 stderr，以免干扰 tqdm 进度条
-            print(f"\n警告: 文件 '{file_path}' 的形状为 {action_data.shape}，期望为 (6,)。已跳过。", file=sys.stderr)
+            print(f"\n警告: 文件 '{file_path}' 的形状为 {action_data.shape}，期望为 (7,)。已跳过。", file=sys.stderr)
             return None
     except Exception as e:
         print(f"\n错误: 无法加载或处理文件 '{file_path}'。错误信息: {e}", file=sys.stderr)

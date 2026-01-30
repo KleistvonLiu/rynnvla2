@@ -318,17 +318,17 @@ Put all HDF5 files in a json file, see `rynnvla-002/data_lerobot/modified_data_f
 ```
 cd rynnvla-002/data_lerobot
 python extract_all_data.py \
-    --json_path {json_path}
-    --output_dir {raw_data_output_dir}
-    --num_processes {num_processes to accelerate}
+    --json_path /jedata/jemotor/code/RynnVLA-002/rynnvla-002/data_lerobot/test_1204_rynnvla_jsonfile.json
+    --output_dir /jedata/test_1204_rynnvla_raw/
+    --num_processes 128
 ```
 
 #### Step 3: Generate conversation files
 Generate the VLA model conversation file and world model conversation file:
 ```
 cd rynnvla-002/lerobot_util
-python action_model_conv_generation_w_2_abs_state_all_data.py --input_dir {raw_data_output_dir} --his 1 --len_action 20 --task_name vla_data --output_dir {conv_output_dir}
-python world_model_conv_generation_w_2_abs_front_all_data.py --input_dir {raw_data_output_dir} --his 1 --task_name world_model_data --output_dir {conv_output_dir}
+python action_model_conv_generation_w_2_abs_state_all_data.py --input_dir /jedata/test_1204_rynnvla_raw/ --his 1 --len_action 20 --task_name vla_data --output_dir /jedata/test_1204_rynnvla_step3/
+python world_model_conv_generation_w_2_abs_front_all_data.py --input_dir /jedata/test_1204_rynnvla_raw/ --his 1 --task_name world_model_data --output_dir /jedata/test_1204_rynnvla_step3/
 python world_model_conv_generation_w_2_abs_wrist_all_data.py --input_dir {raw_data_output_dir} --his 1 --task_name world_model_data --output_dir {conv_output_dir}
 ```
 
@@ -336,18 +336,18 @@ python world_model_conv_generation_w_2_abs_wrist_all_data.py --input_dir {raw_da
 First, calculate the min and max value of action data and state data:
 ```
 cd rynnvla-002/data_lerobot
-python calculate_min_max_all_data_state.py {raw_data_output_dir}
-python calculate_min_max_all_data_action.py {raw_data_output_dir}
+python calculate_min_max_all_data_state.py /jedata/test_1204_rynnvla_raw/
+python calculate_min_max_all_data_action.py /jedata/test_1204_rynnvla_raw/
 ```
 Put the results at the beginning of `rynnvla-002/data_lerobot/item_processor.py`  
 Then, tokenize all training data and concate them:
 ```
 python pretoken_lerobot_state.py \
-    --input_file {conv_output_dir}/libero_vla_data_his_1_train_img_state_abs_ck_1_256.json \
-    --output_dir {raw_data_output_dir}/tokens/vla_data \
+    --input_file /jedata/test_1204_rynnvla_step3//libero_vla_data_his_1_train_img_state_abs_ck_1_256.json \
+    --output_dir /jedata/test_1204_rynnvla_raw//tokens/vla_data \
     --resolution 256 \
-    --tokenizer_path ../ckpts/models--Alpha-VLLM--Lumina-mGPT-7B-768/snapshots/9624463a82ea5ce814af9b561dcd08a31082c3af
-python -u concate_record.py --sub_record_dir {raw_data_output_dir}/tokens/vla_data --save_path {raw_data_output_dir}/tokens/vla_data/record.json
+    --tokenizer_path /jedata/jemotor/source/Rynnvla002/Rynnvla002
+python -u concate_record.py --sub_record_dir /jedata/test_1204_rynnvla_raw/tokens/vla_data --save_path /jedata/test_1204_rynnvla_raw/tokens/vla_data/record.json
 python pretoken_lerobot.py \
     --input_file {conv_output_dir}/libero_world_model_data_his_1_train_a2i_512_abs_front_all_data.json \
     --output_dir {raw_data_output_dir}/tokens/world_model_data_front \
