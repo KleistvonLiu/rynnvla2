@@ -107,8 +107,9 @@ if __name__ == '__main__':
             episode_metadata["language_instruction"] = batch['task']
 
         # Append data for the current step
-        episode_data["front_images"].append(to_hwc_uint8_numpy(batch['observation.images.front']))
-        episode_data["wrist_images"].append(to_hwc_uint8_numpy(batch['observation.images.wrist']))
+        episode_data["front_images"].append(to_hwc_uint8_numpy(batch['camera0']))
+        episode_data["wrist_images"].append(to_hwc_uint8_numpy(batch['camera1']))
+        episode_data["right_images"].append(to_hwc_uint8_numpy(batch['camera3']))
         episode_data["states"].append(batch['observation.state'].cpu().numpy().astype(np.float32))
         episode_data["actions"].append(batch['action'].cpu().numpy().astype(np.float32))
         episode_data["timestamps"].append(batch['timestamp'].cpu().numpy().astype(np.float32))
